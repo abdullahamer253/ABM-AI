@@ -64,9 +64,9 @@ def start(bot, update):
         chat_log = None
         cache = None
         qcache = None
-        botname = 'Harshit Ethic'
+        botname = 'BEMO'
         username = 'harshitethic_bot'
-        update.message.reply_text('Hi')
+        update.message.reply_text('أنا اسمي بيمو بوت من تطوير abm و مطوري هو عبدالله عامر')
         return 
     else:
         update.message.reply_text('I am currently talking to someone else. Can you please wait ' + left + ' seconds?')
