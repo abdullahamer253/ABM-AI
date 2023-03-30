@@ -1,42 +1,31 @@
-import telegram.ext
+
+import telebot
 import openai
 
-# Set up the Telegram bot
-bot_token = "5794438845:AAGwYnguPlnRwH7gMSyjIUZSjkx8OF6fg9Y"
-updater = telegram.ext.Updater(token=bot_token, use_context=True)
-dispatcher = updater.dispatcher
+# إنشاء كائن من فئة TeleBot وإدخال رمز الترميز الخاص بالبوت
+bot = telebot.TeleBot("5794438845:AAGwYnguPlnRwH7gMSyjIUZSjkx8OF6fg9Y")
 
-# Set up the OpenAI API
-openai.api_key = "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"
+# تعيين مفتاح واجهة برمجة التطبيقات الخاص بGPT3
+openai.api_key = "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"
 
-# Define a function to handle incoming messages
-def handle_message(update, context):
-    # Get the incoming message text and chat ID
-    message_text = update.message.text
-    chat_id = update.message.chat_id
-    
-    # Generate a response using GPT-3
-    response = generate_response(message_text)
-    
-    # Send the response back to the user
-    context.bot.send_message(chat_id=chat_id, text=response)
-
-# Define a function to generate a response using GPT-3
-def generate_response(prompt):
+# تعريف دالة للتعامل مع جميع أنواع الرسائل
+@bot.message_handler(func=lambda message: True)
+def chat_message(message):
+    # إرسال رسالة تفيد بأن البوت يقوم بالكتابة
+    bot.send_chat_action(message.chat.id, "typing")
+    # استخدام نموذج davinci من GPT3 لتوليد رد على الرسالة التي تلقاها البوت
     response = openai.Completion.create(
         engine="davinci",
-        prompt=prompt,
-        temperature=0.7,
+        prompt=message.text,
+        temperature=0.9,
         max_tokens=150,
         top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
+        frequency_penalty=0.0,
+        presence_penalty=0.6,
+        stop=["\n"]
     )
-    return response.choices[0].text.strip()
+    # إرسال الرد المولد إلى المستخدم
+    bot.reply_to(message, response["choices"][0]["text"])
 
-# Register the message handler function
-dispatcher.add_handler(telegram.ext.MessageHandler(telegram.ext.Filters.text, handle_message))
-
-# Start the bot
-updater.start_polling()
-updater.idle()
+# بدء حلقة التلقي (polling) للاستماع إلى الرسائل
+bot.polling()
